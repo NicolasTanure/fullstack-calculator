@@ -751,3 +751,11 @@ copy were removed or reset. The user's running application was left alone.
 PROMPTS.md remains closed at 22 entries. The user handles the push after the
 authorized local commit of the validated changes.
 Do not implement optional operations or publish without further authorization.
+
+The post-review frontend test correction waits for request-completion focus
+restoration in success and API-error assertions. Rendering a result or error does
+not guarantee that React's focus effect has finished. Production code is unchanged.
+All 120 tests passed in five consecutive coverage runs, and the TypeScript/Vite
+build passed. Removing focus restoration in an isolated copy still failed the
+corrected success test on its focus assertion. Coverage remains 95.6% statements
+and 95.58% branches. PROMPTS.md remains closed.

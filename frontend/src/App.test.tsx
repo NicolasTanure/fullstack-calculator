@@ -72,7 +72,7 @@ test('sends the entered operands and shows the API result', async () => {
 
   expect(await screen.findByRole('status', { name: 'Result' })).toHaveTextContent(/^10$/)
   expect(screen.queryByText(/^Approximate result\./)).not.toBeInTheDocument()
-  expect(screen.getByRole('button', { name: 'Calculate' })).toHaveFocus()
+  await waitFor(() => expect(screen.getByRole('button', { name: 'Calculate' })).toHaveFocus())
   expect(fetchMock).toHaveBeenCalledWith('/api/add', expect.objectContaining({
     body: '{"left":8,"right":2}',
   }))
@@ -112,7 +112,7 @@ test('clears a subtraction error when the operation changes', async () => {
   fireEvent.click(screen.getByRole('button', { name: 'Calculate' }))
   expect(await screen.findByRole('alert')).toHaveTextContent('The calculation result must be finite.')
   expect(screen.getByRole('button', { name: 'Calculate' })).toBeEnabled()
-  expect(screen.getByRole('button', { name: 'Calculate' })).toHaveFocus()
+  await waitFor(() => expect(screen.getByRole('button', { name: 'Calculate' })).toHaveFocus())
   fireEvent.change(screen.getByRole('combobox'), { target: { value: 'add' } })
   expect(screen.queryByRole('alert')).not.toBeInTheDocument()
 })
@@ -168,7 +168,7 @@ test.each(['0', '-0', '1e-999', '-1e-999'])('shows the backend division-by-zero 
   expect(screen.getByLabelText('Second number')).toBeEnabled()
   expect(screen.getByRole('combobox')).toBeEnabled()
   expect(screen.getByRole('button', { name: 'Calculate' })).toBeEnabled()
-  expect(screen.getByRole('button', { name: 'Calculate' })).toHaveFocus()
+  await waitFor(() => expect(screen.getByRole('button', { name: 'Calculate' })).toHaveFocus())
   expect(screen.queryByRole('status', { name: 'Result' })).not.toBeInTheDocument()
   fireEvent.change(screen.getByLabelText('Second number'), { target: { value: '2' } })
   expect(screen.queryByRole('alert')).not.toBeInTheDocument()

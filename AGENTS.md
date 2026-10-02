@@ -36,8 +36,8 @@ must be in English. Discussion with the user may remain in Portuguese.
 - Include Dockerfiles for both applications and Docker Compose.
 - Provide a README with setup, execution, tests, coverage, API examples, design
   decisions, assumptions, and project structure.
-- Preserve the existing 21 entries in `PROMPTS.md`. Record new prompts only when
-  explicitly requested by the user.
+- Preserve the existing 22 entries in `PROMPTS.md`. The prompt log is closed;
+  add entries only if the user explicitly reopens it.
 - Consider exponentiation, square root, and percentage only after every mandatory
   requirement is implemented, tested, documented, and reviewed. Define their
   behavior with the user before implementation.
@@ -157,9 +157,11 @@ failure mechanisms solely to exercise a 500 response.
 ### Backend validation and numeric behavior
 
 - Require `Content-Type: application/json`; valid media-type parameters may be
-  accepted.
+  accepted. Reject multiple Content-Type headers to avoid ambiguous input.
 - Limit request bodies to 1,024 bytes.
 - Require exactly one JSON object containing both operand fields.
+- Require each operand field to occur once, including equivalent escaped names.
+  Reject duplicate fields rather than allowing a later value to overwrite one.
 - Reject malformed JSON, missing fields, unknown fields, `null`, strings,
   booleans, arrays, and other incorrect operand or body types.
 - Reject any non-whitespace content after the JSON object.
@@ -369,8 +371,9 @@ needed, and agree any material sequence changes with the user.
 
 ## AI prompt documentation
 
-`PROMPTS.md` retains the existing 21 entries. Do not append new entries or record
-new prompts unless the user explicitly asks. User-requested edits to existing
+`PROMPTS.md` retains 22 entries and is closed after the final edge-case and
+Clean Code review prompt. Do not append entries unless the user explicitly
+reopens the log. User-requested edits to existing
 entries are allowed, including generic project wording. The rules below apply
 when prompt recording is explicitly requested:
 
@@ -676,6 +679,75 @@ REQUISITES.md use generic English project language. Automatic prompt recording
 is disabled; the existing 21 entries remain, with only requested wording edits.
 The mandatory final review is still pending.
 
-Stop for user review. Next is requirement 9: complete documentation and perform
-the mandatory final project review. Do not begin final review or optional
-operations before authorization.
+The requested input and numeric edge-case audit is complete. Regression tests
+first reproduced two validation gaps on all four endpoints: duplicate JSON
+operand fields and ambiguous multiple Content-Type headers. Shared HTTP validation
+now rejects them with 400 / invalid_input and 415 / unsupported_media_type,
+respectively. JSON decoding checks each field before accepting its value; escaped
+duplicate names and null values overwritten by numbers cannot bypass validation.
+
+Expanded tests cover malformed JSON numeric syntax, incomplete exponents, comments,
+trailing non-JSON whitespace, HEAD/Allow behavior, finite float64 boundaries,
+tiny nonzero divisors, overflow, and positive/negative underflow to zero. Frontend
+tests cover empty fields, isolated signs, expressions, internal whitespace,
+invisible characters, unsupported Unicode numeric symbols, signed zero, and
+extreme-result formatting. No numeric range, arithmetic, or UI behavior changed.
+
+All 120 frontend tests, strict TypeScript checks, and production build passed.
+Backend tests, build, go vet, and formatting passed. Updated coverage is 92.2%
+overall backend statements and 97.1% for HTTP handlers; arithmetic remains 100%.
+Frontend coverage is 95.6% statements and 95.58% branches. Generated reports
+remain excluded from Git. The new Go fuzz target completed 618,050 executions
+in a bounded 20-second run without failures; this does not claim exhaustive
+input or transport testing.
+
+An isolated Compose application on port 18081 rebuilt both images, including their
+tests, and passed 256 HTTP checks through Nginx. Checks included all operations,
+invalid inputs, duplicate fields, numeric extremes, exact/excessive body sizes,
+chunked oversized requests, media types, methods, paths, and 24 concurrent
+requests. The temporary containers and network were removed. The user's existing
+application was not restarted; it needs rebuilding to load backend changes.
+PROMPTS.md was not changed. This focused audit does not complete the entire
+mandatory final project review.
+
+Requirement 9, the mandatory final project review, is complete following the
+user's request to audit test quality and compare the application with the supplied
+requirements. All mandatory features and deliverables are implemented locally:
+the four operations, React/TypeScript frontend, Go REST API, validation, JSON
+results/errors, basic mobile responsiveness, tests, generated coverage reports,
+and concise setup/API/design documentation. Both Dockerfiles and unified Compose
+startup also fulfill the optional Docker requirement. Advanced operations remain
+optional and require a separate behavior discussion and authorization.
+
+Review removed one duplicate HTTP tiny-divisor success case; the same request and
+assertion remain covered in the division endpoint tests. The API-client test now
+returns a deliberately different mock result to detect local recalculation as
+well as unwanted rounding. Eight selected regressions in temporary copies were
+detected by assertion failures: incorrect addition, missing zero-divisor rejection,
+acceptance of duplicate fields or ambiguous media types, local frontend arithmetic,
+numeric-prefix acceptance, enabled pending controls, and retained stale results.
+This is a bounded test-quality check, not an exhaustive mutation score.
+
+Backend tests, build, go vet, and formatting passed. All 120 frontend tests,
+TypeScript checks, and production build passed. Coverage reports were generated
+and inspected: backend statements 92.2% overall, arithmetic 100%, HTTP handlers
+97.1%; frontend statements 95.6% and branches 95.58%. Startup files remain included
+with zero unit coverage and were exercised through actual native and Docker startup.
+
+A clean copy of the 48 deliverable project files excluded dependencies, generated
+artifacts, and local environment files. npm ci succeeded with Node 24.19.0, and
+both Docker images built without build-cache reuse, running their tests. Compose
+startup passed 256 HTTP checks, including 24 concurrent requests. Native Go/Vite
+startup passed 11 additional API/proxy/README checks on temporary ports 18080/5174.
+Browser checks verified four operations, keyboard submission, invalid-input focus,
+division-by-zero retry, approximation feedback, unavailable-service feedback,
+and successful manual retry after restarting the backend. Basic layout checks
+at 320 and 375 pixels found no horizontal overflow. No physical-device or
+screen-reader speech verification is claimed. Validation used Linux ARM64 Docker;
+AMD64 is not verified. Ordinary float64 limitations remain documented.
+
+Temporary servers, containers, network, browser tab, viewport override, and clean
+copy were removed or reset. The user's running application was left alone.
+PROMPTS.md remains closed at 22 entries. The user handles the push after the
+authorized local commit of the validated changes.
+Do not implement optional operations or publish without further authorization.

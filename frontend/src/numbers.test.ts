@@ -8,6 +8,8 @@ test.each([
   ['1.7976931348623157e308', Number.MAX_VALUE],
   ['-1.7976931348623157e308', -Number.MAX_VALUE],
   ['1e-999', 0],
+  ['-0', -0], ['-1e-999', -0], ['+.5E+2', 50],
+  ['0008.00', 8], ['\t\n-2.5\r ', -2.5],
 ] as const)('parses valid input %s', (input, expected) => {
   expect(parseOperand(input)).toEqual({ valid: true, value: expected })
 })
@@ -28,6 +30,9 @@ test.each([
 test.each([
   '', '  ', '1,5', '1 000', '0x10', '0b11', '5abc',
   'NaN', 'Infinity', '1e', '--1',
+  '.', '+', '-', '-.', '1e+', '1e-', '1e2e3', '1.2.3',
+  '1_000', '0o10', '2+2', '1/0', '1\n2', '1\u00002',
+  '−2', '１２', '١٢', '1\u200b', '<script>alert(1)</script>',
 ])('identifies invalid numeric format %j', (input) => {
   expect(parseOperand(input)).toEqual({ valid: false, error: 'invalid_format' })
 })
@@ -44,6 +49,9 @@ test.each([
 test.each([
   [0, '0'], [-2.5, '-2.5'], [0.30000000000000004, '0.3'],
   [1.23456789012345, '1.23456789012'], [1e30, '1e+30'], [1e-20, '1e-20'],
+  [-0, '0'], [Number.MIN_VALUE, '5e-324'],
+  [Number.MAX_VALUE, '1.79769313486e+308'],
+  [-Number.MAX_VALUE, '-1.79769313486e+308'],
 ] as const)('formats result %s as %s', (result, expected) => {
   expect(formatResult(result)).toBe(expected)
 })

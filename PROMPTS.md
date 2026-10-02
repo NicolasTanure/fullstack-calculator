@@ -656,3 +656,42 @@ The assistant removed the subtitle and its unused eyebrow CSS rule. All 24
 form tests, strict TypeScript checks, and the production build passed. The
 Docker frontend must be rebuilt to load this source change. Final review remains
 pending.
+
+## 22. Final edge-case, input-validation, and Clean Code review
+
+Perform a comprehensive review of the calculator's robustness, with particular
+attention to edge cases, input validation, error handling, and Clean Code.
+Assess both applications against the approved requirements and numeric contract.
+
+Verify empty and malformed inputs, unsupported numeric formats, negative values,
+signed zero, scientific notation, floating-point boundaries, precision loss,
+overflow, underflow, and division by zero. Review direct API requests for missing,
+duplicate, unknown, or incorrectly typed fields; malformed and trailing JSON;
+content types; body limits; HTTP methods; status codes; headers; and error envelopes.
+Check request states, duplicate submissions, stale results, timeouts, unavailable
+services, invalid responses, and manual retry behavior.
+
+Review naming, readability, responsibility boundaries, duplication, and explicit
+error handling. Keep arithmetic on the backend and avoid unnecessary abstractions,
+dependencies, or changes outside the approved scope. Tests must verify observable
+behavior and meaningful failure modes rather than merely increase coverage.
+
+Reproduce confirmed defects before correcting them, add focused regression tests,
+and run the relevant tests, builds, static checks, and Docker integration checks.
+Report verified findings, corrections, and remaining limitations without claiming
+exhaustive correctness or exact decimal arithmetic. Treat this as the final entry
+in the prompt log; do not record further prompts unless I explicitly reopen it.
+
+### Verified edge-case review outcome
+
+Regression tests exposed duplicate JSON operand fields and conflicting
+Content-Type headers on all four endpoints. Shared backend validation now rejects
+both. Expanded tests cover numeric boundaries, underflowing zero divisors,
+malformed numeric syntax, unsupported characters, and extreme-result formatting.
+
+All 120 frontend tests, backend tests, builds, Go static checks, and formatting
+passed. An isolated Docker application passed 256 HTTP checks, including 24
+concurrent requests. A bounded 20-second Go fuzz run completed 618,050 executions
+without failures. Temporary containers were removed. These checks establish the
+verified edge-case audit; they do not claim completion of every item in the
+mandatory final project review.

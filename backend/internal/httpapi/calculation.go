@@ -25,7 +25,7 @@ func calculate(w http.ResponseWriter, r *http.Request, operation func(float64, f
 	}
 
 	contentType, _, err := mime.ParseMediaType(r.Header.Get("Content-Type"))
-	if err != nil || contentType != "application/json" {
+	if err != nil || contentType != "application/json" || len(r.Header.Values("Content-Type")) != 1 {
 		writeError(w, http.StatusUnsupportedMediaType, "unsupported_media_type", "Content-Type must be application/json.")
 		return
 	}
@@ -66,16 +66,40 @@ func calculate(w http.ResponseWriter, r *http.Request, operation func(float64, f
 
 func decodeOperands(body []byte) (float64, float64, error) {
 	decoder := json.NewDecoder(bytes.NewReader(body))
-	var operands map[string]*float64
-	if err := decoder.Decode(&operands); err != nil {
-		return 0, 0, errors.New("Request body must be a JSON object with numeric left and right fields.")
+	invalidJSON := errors.New("Request body must be a JSON object with numeric left and right fields.")
+	opening, err := decoder.Token()
+	if err != nil || opening != json.Delim('{') {
+		return 0, 0, invalidJSON
+	}
+	operands := make(map[string]float64, 2)
+	for decoder.More() {
+		token, err := decoder.Token()
+		field, ok := token.(string)
+		if err != nil || !ok {
+			return 0, 0, invalidJSON
+		}
+		if field != "left" && field != "right" {
+			return 0, 0, errors.New("Provide exactly two numeric fields: left and right.")
+		}
+		if _, exists := operands[field]; exists {
+			return 0, 0, errors.New("Duplicate operand fields are not allowed.")
+		}
+		var value *float64
+		if err := decoder.Decode(&value); err != nil || value == nil {
+			return 0, 0, invalidJSON
+		}
+		operands[field] = *value
+	}
+	closing, err := decoder.Token()
+	if err != nil || closing != json.Delim('}') {
+		return 0, 0, invalidJSON
 	}
 	var extra any
 	if err := decoder.Decode(&extra); err != io.EOF {
 		return 0, 0, errors.New("Request body must contain a single JSON object.")
 	}
-	if len(operands) != 2 || operands["left"] == nil || operands["right"] == nil {
+	if len(operands) != 2 {
 		return 0, 0, errors.New("Provide exactly two numeric fields: left and right.")
 	}
-	return *operands["left"], *operands["right"], nil
+	return operands["left"], operands["right"], nil
 }

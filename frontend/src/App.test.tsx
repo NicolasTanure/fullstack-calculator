@@ -36,6 +36,8 @@ test('renders the calculator application in the main landmark', () => {
 })
 
 test.each([
+  ['', '2', 'First number has an invalid format. Use a number such as -2.5 or 1e3.'],
+  ['2', '  ', 'Second number has an invalid format. Use a number such as -2.5 or 1e3.'],
   ['1,5', '2', 'First number has an invalid format. Use a number such as -2.5 or 1e3.'],
   ['2', '5abc', 'Second number has an invalid format. Use a number such as -2.5 or 1e3.'],
   ['9'.repeat(400), '2', 'First number is outside the supported numeric range. Enter a smaller absolute value.'],
@@ -149,7 +151,7 @@ test('selects division and preserves operand order', async () => {
   expect(screen.queryByRole('status', { name: 'Result' })).not.toBeInTheDocument()
 })
 
-test.each(['0', '-0'])('shows the backend division-by-zero error for divisor %s and allows retry', async (divisor) => {
+test.each(['0', '-0', '1e-999', '-1e-999'])('shows the backend division-by-zero error for divisor %s and allows retry', async (divisor) => {
   fetchMock.mockResolvedValueOnce(jsonResponse({
     error: { code: 'division_by_zero', message: 'Cannot divide by zero.' },
   }, 400)).mockResolvedValueOnce(jsonResponse({ result: 4 }))

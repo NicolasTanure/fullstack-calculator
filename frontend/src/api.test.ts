@@ -20,10 +20,10 @@ function jsonResponse(body: unknown, status = 200) {
   })
 }
 
-test('sends numeric operands to the addition endpoint and preserves the API result', async () => {
-  fetchMock.mockResolvedValue(jsonResponse({ result: 0.30000000000000004 }))
+test('sends numeric operands and uses the API result without local arithmetic or rounding', async () => {
+  fetchMock.mockResolvedValue(jsonResponse({ result: 0.123456789012345 }))
 
-  await expect(calculate('add', 0.1, 0.2)).resolves.toBe(0.30000000000000004)
+  await expect(calculate('add', 0.1, 0.2)).resolves.toBe(0.123456789012345)
   expect(fetchMock).toHaveBeenCalledExactlyOnceWith('/api/add', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

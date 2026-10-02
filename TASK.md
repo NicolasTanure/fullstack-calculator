@@ -64,8 +64,9 @@ Use English for code, UI text, API messages, and project documentation.
 
 ### AI usage notes
 
-`PROMPTS.md` retains the existing 21 entries. Do not record new prompts or append
-new entries unless the user explicitly requests it. Keep project decisions and
+`PROMPTS.md` retains 22 entries and is closed after the final edge-case and
+Clean Code review prompt. Do not append entries unless the user explicitly
+reopens the log. Keep project decisions and
 development rules current in `AGENTS.md`.
 
 ## Planning and development agreement

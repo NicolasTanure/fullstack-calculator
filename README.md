@@ -75,7 +75,7 @@ curl -i http://localhost:8081/api/divide \
 ```
 
 For native development, use port **8080** in these examples. Requests must contain
-exactly `left` and `right`; the body limit is **1 KiB**. Invalid input and overflow
+exactly `left` and `right`, each once; the body limit is **1 KiB**. Invalid input and overflow
 return 400. Unknown paths, wrong methods, excessive bodies, and incompatible
 content types return 404, 405, 413, and 415 respectively, with JSON errors.
 
@@ -90,6 +90,9 @@ Run each command from the indicated directory:
 
 Backend checks: `go vet ./...` and `gofmt -l .` (formatting should print nothing).
 Frontend builds include TypeScript checks. Both Docker builds also run tests.
+
+Optional input fuzzing from `backend/`:
+`go test ./internal/httpapi -run '^$' -fuzz=FuzzCalculationInput -fuzztime=20s -parallel=2`.
 
 <details>
 <summary><strong>Generate coverage reports</strong></summary>
@@ -131,7 +134,7 @@ flowchart LR
 - **Limited numeric precision.** Go uses `float64`; the UI displays up to 12
   significant digits. `≈` and a note indicate display rounding or possible
   precision loss with large integers. This is not exact decimal arithmetic;
-  absence of `≈` does not guarantee exactness.
+  absence of `≈` does not guarantee exactness. Very small values may underflow to zero.
 - **Predictable failures.** The backend validates direct API callers. The UI
   disables controls during requests, waits up to 10 seconds, and allows manual
   retry. Go rejects zero divisors and non-finite operands/results.

@@ -1,0 +1,166 @@
+:root {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #18243a;
+  background: #f3f5f8;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 280px;
+}
+
+.calculator-shell {
+  display: grid;
+  min-height: 100svh;
+  padding: 1.5rem;
+  place-items: center;
+}
+
+.calculator-card {
+  width: 100%;
+  max-width: 36rem;
+  padding: clamp(1.5rem, 6vw, 3rem);
+  border: 1px solid #dce2ea;
+  border-radius: 1rem;
+  background: #fff;
+  box-shadow: 0 0.75rem 2.5rem rgb(24 36 58 / 5%);
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(2rem, 7vw, 3rem);
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+}
+
+.introduction {
+  margin: 1rem 0 0;
+  color: #546176;
+  line-height: 1.6;
+}
+
+form {
+  margin-top: 2rem;
+}
+
+.operands {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.5rem;
+}
+
+label {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+input,
+select,
+button {
+  width: 100%;
+  min-width: 0;
+  min-height: 2.75rem;
+  border: 1px solid #bbc5d3;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  font: inherit;
+}
+
+input,
+select {
+  color: inherit;
+  background: #fff;
+}
+
+input:focus-visible,
+select:focus-visible,
+button:focus-visible {
+  outline: 3px solid #8dacec;
+  outline-offset: 2px;
+}
+
+input[aria-invalid="true"] {
+  border-color: #8f2424;
+}
+
+.input-hint,
+.result-hint {
+  color: #546176;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.input-hint {
+  margin: 0.75rem 0 1.5rem;
+}
+
+.result-hint {
+  margin: 0;
+}
+
+button {
+  margin-top: 1.5rem;
+  border-color: #304d9a;
+  color: #fff;
+  background: #304d9a;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  background: #243d80;
+}
+
+:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.error {
+  margin: 1.5rem 0 0;
+  border: 1px solid #e5b6b6;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  color: #8f2424;
+  background: #fff4f4;
+  line-height: 1.5;
+}
+
+.result {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  background: #edf2fb;
+}
+
+.result-label {
+  color: #546176;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+output {
+  font-size: 1.75rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 400px) {
+  .operands {
+    grid-template-columns: 1fr;
+  }
+}
